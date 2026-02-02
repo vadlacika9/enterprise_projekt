@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model booking {
+  booking_id Int      @id @default(autoincrement())
+  start_date DateTime @db.Date
+  end_date   DateTime @db.Date
+  status     String   @db.Char(30)
+  payment_id Int
+  room_id    Int
+  payment    payment  @relation(fields: [payment_id], references: [payment_id], onUpdate: Restrict, map: "booking_ibfk_1")
+  room       room     @relation(fields: [room_id], references: [room_id], onUpdate: Restrict, map: "booking_ibfk_2")
+
+  @@index([payment_id], map: "payment_id")
+  @@index([room_id], map: "room_id")
+}
+
+model equipment {
+  equipment_id   Int              @id @default(autoincrement())
+  name           String           @db.VarChar(50)
+  room_equipment room_equipment[] @ignore
+}
+
+model payment {
+  payment_id  Int       @id @default(autoincrement())
+  total_price Float     @db.Float
+  method      String    @db.VarChar(30)
+  user_id     Int
+  booking     booking[]
+  users       users     @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "payment_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model room {
+  room_id        Int              @id @default(autoincrement())
+  city           String           @db.VarChar(30)
+  street         String           @db.VarChar(30)
+  adress_number  String           @db.VarChar(10)
+  postal_code    String           @db.VarChar(10)
+  capacity       Int
+  is_available   Int
+  hourly_price   Float            @db.Float
+  room_number    String           @db.VarChar(10)
+  user_id        Int
+  booking        booking[]
+  users          users            @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "room_ibfk_1")
+  room_equipment room_equipment[] @ignore
+
+  @@index([user_id], map: "user_id")
+}
+
+model room_equipment {
+  value        Int
+  room_id      Int
+  equipment_id Int
+  room         room      @relation(fields: [room_id], references: [room_id], onUpdate: Restrict, map: "room_equipment_ibfk_1")
+  equipment    equipment @relation(fields: [equipment_id], references: [equipment_id], onUpdate: Restrict, map: "room_equipment_ibfk_2")
+
+  @@id([room_id, equipment_id]) // Ez lesz az egyedi azonosító
+  @@index([equipment_id], map: "equipment_id")
+  @@index([room_id], map: "room_id")
+}
+
+model users {
+  username     String    @unique(map: "username") @db.VarChar(15)
+  user_id      Int       @id @default(autoincrement())
+  email        String    @unique(map: "email") @db.VarChar(50)
+  password     String    @db.VarChar(65)
+  phone_number String    @db.VarChar(20)
+  first_name   String    @db.VarChar(30)
+  last_name    String    @db.VarChar(30)
+  role         String    @db.VarChar(10)
+  payment      payment[]
+  room         room[]
+}
