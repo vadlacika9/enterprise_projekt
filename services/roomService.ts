@@ -1,6 +1,6 @@
 import { RoomRepository } from "../repositories/roomRepository.js";
 import { EquipmentRepository } from "../repositories/equipmentRepository.js";
-import type { RoomData, RoomEquipmentData } from "../types/roomType.js";
+import type { RoomData, RoomEquipmentData } from "../types/room.ts";
 
 const roomRepo = new RoomRepository();
 const equipmentRepo = new EquipmentRepository();

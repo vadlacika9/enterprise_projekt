@@ -1,12 +1,6 @@
 import { prisma } from '../lib/prisma.js';
+import type { CreateImageData } from '../types/image.ts';
 
-export type CreateImageData = {
-  room_id: number;
-  url: string;
-  pathname: string;
-  contentType?: string | null;
-  size?: number | null;
-};
 
 export class ImageRepository {
   async create(data: CreateImageData) {
