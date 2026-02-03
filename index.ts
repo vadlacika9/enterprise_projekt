@@ -2,10 +2,21 @@ import express, { type Request, type Response } from 'express';
 import router from './routes/userRoutes.js';
 import roomRouter from './routes/roomRoutes.js';
 import equipmentRouter from './routes/equipmentRoutes.js';
+import cors from "cors";
 
 const app = express();
 
 const PORT = 3000;
+
+const corsOptions = {
+origin: 'http://localhost:3001',
+methods: ["GET", "POST", "PUT", "DELETE"],
+ credentials: true,
+optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+
 
 app.get("/", (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the Express + TypeScript Server!' });

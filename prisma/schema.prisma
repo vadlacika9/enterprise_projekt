@@ -24,7 +24,6 @@ model booking {
 model equipment {
   equipment_id   Int              @id @default(autoincrement())
   name           String           @db.VarChar(50)
-
   room_equipment room_equipment[]
 }
 
@@ -50,6 +49,8 @@ model room {
   hourly_price   Float            @db.Float
   room_number    String           @db.VarChar(10)
   user_id        Int
+  title          String           @db.VarChar(100)
+  description    String?          @db.VarChar(255)
   booking        booking[]
   users          users            @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "room_ibfk_1")
   room_equipment room_equipment[]
@@ -57,6 +58,7 @@ model room {
   @@index([user_id], map: "user_id")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model room_equipment {
   value        Int
   room_id      Int
@@ -64,7 +66,7 @@ model room_equipment {
   room         room      @relation(fields: [room_id], references: [room_id], onUpdate: Restrict, map: "room_equipment_ibfk_1")
   equipment    equipment @relation(fields: [equipment_id], references: [equipment_id], onUpdate: Restrict, map: "room_equipment_ibfk_2")
 
-  @@id([room_id, equipment_id]) // Ez lesz az egyedi azonosító
+  @@id([room_id, equipment_id])
   @@index([equipment_id], map: "equipment_id")
   @@index([room_id], map: "room_id")
 }
