@@ -1,4 +1,4 @@
-import {prisma} from '../lib/prisma.js';
+import { prisma } from '../lib/prisma.js';
 import type { RoomData } from '../types/roomType.js';
 
 export class RoomRepository {
@@ -9,7 +9,20 @@ export class RoomRepository {
 
     async findById(id: number) {
         return await prisma.room.findUnique({
-        where: { room_id: id }
+            where: { room_id: id }
+        });
+    }
+
+    async findDetailsById(id: number) {
+        return await prisma.room.findUnique({
+            where: { room_id: id },
+            include: {
+                room_equipment: {
+                    include: {
+                        equipment: true
+                    }
+                }
+            }
         });
     }
 
@@ -26,31 +39,42 @@ export class RoomRepository {
         });
     }
 
-    async create(roomData:RoomData){
+    async create(roomData: RoomData) {
         return await prisma.room.create({
             data: roomData
         });
     }
 
-    async delete(id:number){
+    async delete(id: number) {
         return await prisma.room.delete({
             where: { room_id: id }
         });
     }
 
-    async updateAvailability(id:number, is_available:number){
+    async update(id: number, data: Partial<RoomData>) {
         return await prisma.room.update({
             where: { room_id: id },
-            data: { is_available: is_available }
+            data
         });
     }
 
-    async addEquipment(roomId:number, equipmentId:number, value:number) {
+    async addEquipment(roomId: number, equipmentId: number, value: number) {
         return await prisma.room_equipment.create({
             data: {
                 room_id: roomId,
                 equipment_id: equipmentId,
                 value: value
+            }
+        });
+    }
+
+    async removeEquipment(roomId: number, equipmentId: number) {
+        return await prisma.room_equipment.delete({
+            where: {
+                room_id_equipment_id: {
+                    room_id: roomId,
+                    equipment_id: equipmentId
+                }
             }
         });
     }

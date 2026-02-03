@@ -10,3 +10,8 @@ export type RoomData = {
   user_id: number,
 };
 
+export type RoomEquipmentData = {
+  equipment_id: number,
+  name: string,
+  value: number,
+};
