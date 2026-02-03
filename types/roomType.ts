@@ -7,6 +7,8 @@ export type RoomData = {
   is_available: number,
   hourly_price: number,
   room_number: string,
+  title: string,
+  description: string,
   user_id: number,
 };
 
