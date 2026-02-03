@@ -24,7 +24,8 @@ model booking {
 model equipment {
   equipment_id   Int              @id @default(autoincrement())
   name           String           @db.VarChar(50)
-  room_equipment room_equipment[] @ignore
+
+  room_equipment room_equipment[]
 }
 
 model payment {
@@ -51,7 +52,7 @@ model room {
   user_id        Int
   booking        booking[]
   users          users            @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "room_ibfk_1")
-  room_equipment room_equipment[] @ignore
+  room_equipment room_equipment[]
 
   @@index([user_id], map: "user_id")
 }
