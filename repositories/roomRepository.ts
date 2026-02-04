@@ -52,19 +52,16 @@ export class RoomRepository {
 
     async addMultipleEquipments(roomId: number, equipmentIds: number[]) {
         console.log("ids:"+equipmentIds)
-    // A Prisma 'createMany' segítségével egyszerre szúrjuk be az összes sort
     return await prisma.room_equipment.createMany({
         data: equipmentIds.map((id) => ({
             room_id: roomId,
             equipment_id: id,
-            value: 1, // Itt megadhatod az alapértelmezett értéket
+            value: 1,
         })),
-        // Opcionális: Ha véletlenül kétszer küldenék el ugyanazt, ne szálljon el a kód
-        skipDuplicates: true, 
+        skipDuplicates: true,
     });
 }
 
-    
 
     async delete(id: number) {
         return await prisma.room.delete({

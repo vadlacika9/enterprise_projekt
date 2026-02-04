@@ -14,28 +14,48 @@ export const getRooms = async (req: Request, res: Response) => {
     }
 }
 
+
 export const addRoom = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.id;
-        const roomData = req.body;
-        const { selectedEquipments, ...restRoomData } = roomData;
+        const files = req.files as Express.Multer.File[];
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ message: "No images provided" });
+        }
+
+        const roomData = req.body as Record<string, any>;
+
+        let selectedEquipments: number[] = [];
+        const raw = roomData.selectedEquipments;
+
+        if (Array.isArray(raw)) {
+            selectedEquipments = raw.map(Number);
+        } else if (typeof raw === 'string') {
+            try {
+                selectedEquipments = JSON.parse(raw).map(Number);
+            } catch {
+                selectedEquipments = raw.split(',').map(Number);
+            }
+        }
 
         const finalRoomData = {
-            ...restRoomData,
+            title: roomData.title,
+            city: roomData.city,
+            postal_code: roomData.postal_code,
+            street: roomData.street,
+            adress_number: roomData.adress_number,
+            room_number: roomData.room_number,
+            capacity: Number(roomData.capacity),
+            hourly_price: Number(roomData.hourly_price),
+            description: roomData.description,
             user_id: userId,
-            is_available: 0,
-            capacity: Number(restRoomData.capacity),
-            hourly_price: Number(restRoomData.hourly_price),
-
+            is_available: 1,
         };
 
-
-        console.log("user:", userId)
-        console.log("final:", finalRoomData);
-        const newRoom = await roomService.createRoom(finalRoomData, selectedEquipments);
+        const newRoom = await roomService.createRoomWithImages(finalRoomData, selectedEquipments, files);
         res.status(201).json(newRoom);
-    }
-    catch (error: any) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 }
