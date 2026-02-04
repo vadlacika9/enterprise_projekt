@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { addRoom, getRoomById, getRooms, getAvailableRooms, deleteRoom, getRoomEquipment, addEquipmentToRoom, getRoomDetails, updateRoom, removeEquipmentFromRoom, checkRoomAvailability } from '../controllers/roomController.js';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 const upload = multer({
@@ -11,7 +11,7 @@ const upload = multer({
 
 router.get('/', getRooms);
 
-router.post('/add', authenticateToken, upload.array('images', 10), addRoom);
+router.post('/add', authenticateToken, requireRole('OWNER'), upload.array('images', 10), addRoom);
 
 router.put('/:id', updateRoom);
 
