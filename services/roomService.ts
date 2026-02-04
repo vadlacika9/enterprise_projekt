@@ -1,11 +1,17 @@
 import { RoomRepository } from "../repositories/roomRepository.js";
 import { EquipmentRepository } from "../repositories/equipmentRepository.js";
 import type { RoomData, RoomEquipmentData } from "../types/room.ts";
-import { ImageService } from "./imageService.js";
-import { type CreateImageData } from '../types/image.js'
+import { prisma } from "../lib/prisma.js";
+import { put, del } from '@vercel/blob';
 
 const roomRepo = new RoomRepository();
 const equipmentRepo = new EquipmentRepository();
+
+function requireBlobToken() {
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) throw new Error('Missing BLOB_READ_WRITE_TOKEN');
+    return token;
+}
 
 export class RoomService {
 
@@ -29,16 +35,72 @@ export class RoomService {
         return await roomRepo.allAvailable();
     }
 
-    async createRoom(roomData: RoomData, selectedEquipments: []) {
+    async createRoomWithImages(
+        roomData: RoomData,
+        selectedEquipments: number[],
+        files: Express.Multer.File[]
+    ) {
+        const uploadedBlobs: Array<{ url: string; pathname: string; contentType: string; size: number }> = [];
+        const token = requireBlobToken();
 
-        const newRoom = await roomRepo.create(roomData);
-        console.log("selected:" + selectedEquipments)
-        if (selectedEquipments && selectedEquipments.length > 0) {
-        await roomRepo.addMultipleEquipments(newRoom.room_id,selectedEquipments);
-    }
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                const newRoom = await tx.room.create({ data: roomData });
 
-    // 3. Visszaadjuk a teljes szoba objektumot (opcionálisan a felszerelésekkel együtt)
-    return newRoom;
+                if (selectedEquipments.length > 0) {
+                    await tx.room_equipment.createMany({
+                        data: selectedEquipments.map((id) => ({
+                            room_id: newRoom.room_id,
+                            equipment_id: id,
+                            value: 1
+                        })),
+                        skipDuplicates: true
+                    });
+                }
+
+                for (const file of files) {
+                    const safeName = file.originalname?.replace(/[^\w.\-]+/g, '_') || 'upload';
+                    const blobPath = `rooms/${newRoom.room_id}/${Date.now()}-${safeName}`;
+                    const blob = await put(blobPath, file.buffer, {
+                        access: 'public',
+                        contentType: file.mimetype,
+                        token
+                    });
+                    uploadedBlobs.push({
+                        url: blob.url,
+                        pathname: blob.pathname,
+                        contentType: file.mimetype,
+                        size: file.size
+                    });
+                }
+
+                if (uploadedBlobs.length > 0) {
+                    await tx.image.createMany({
+                        data: uploadedBlobs.map((img) => ({
+                            room_id: newRoom.room_id,
+                            url: img.url,
+                            pathname: img.pathname,
+                            contentType: img.contentType,
+                            size: img.size
+                        }))
+                    });
+                }
+
+                return newRoom;
+            });
+
+            return result;
+        } catch (error) {
+            try {
+                const token = process.env.BLOB_READ_WRITE_TOKEN;
+                if (token) {
+                    for (const img of uploadedBlobs) {
+                        await del(img.url, { token });
+                    }
+                }
+            } catch {}
+            throw error;
+        }
     }
 
     async deleteRoom(id: number) {

@@ -26,12 +26,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use(express.json());
 
 app.use("/users", router);
-// Fontos: az image route-okat a roomRouteS ELÉ tesszük, hogy a /rooms/:id/images ne ütközzön a /rooms/:roomId/:equipmentId útvonallal
-
-app.use("/rooms", roomRouter);
-
-app.use("/rooms", imageRouter);
-
+app.use("/rooms", roomRouter, imageRouter);
 app.use("/equipment", equipmentRouter);
 
 app.use("/payments", paymentRouter);
