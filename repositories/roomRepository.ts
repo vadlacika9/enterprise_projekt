@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import type { RoomData } from '../types/roomType.js';
+import type { RoomData } from '../types/room.ts';
 
 export class RoomRepository {
 
