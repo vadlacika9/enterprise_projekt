@@ -3,6 +3,7 @@ import router from './routes/userRoutes.js';
 import roomRouter from './routes/roomRoutes.js';
 import equipmentRouter from './routes/equipmentRoutes.js';
 import imageRouter from './routes/imageRoutes.js';
+import paymentRouter from './routes/paymentRoutes.js'
 import cors from "cors";
 
 const app = express();
@@ -32,6 +33,8 @@ app.use("/rooms", roomRouter);
 app.use("/rooms", imageRouter);
 
 app.use("/equipment", equipmentRouter);
+
+app.use("/payments", paymentRouter);
 
 app.listen(PORT, () => {
   console.log(`App is running on PORT ${PORT}`)
