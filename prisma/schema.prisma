@@ -84,6 +84,7 @@ model room_equipment {
   @@id([room_id, equipment_id])
   @@index([equipment_id], map: "equipment_id")
   @@index([room_id], map: "room_id")
+  @@ignore
 }
 
 model users {
