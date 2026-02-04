@@ -12,6 +12,18 @@ export const getEquipment = async (req: Request, res: Response) => {
   }
 };
 
+export const getRoomEquipment = async(req: Request, res: Response) => {
+  try{
+     const roomId = Number(req.params.id);
+     console.log("roomid:", roomId)
+    const equipment = await equipmentService.getRoomEquipments(roomId);
+    res.status(200).json(equipment);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+  }
+
+
 
 export const createEquipment = async (req: Request, res: Response) => {
   try {

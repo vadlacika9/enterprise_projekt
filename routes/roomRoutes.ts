@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { addRoom, getRoomById, getRooms, getAvailableRooms, deleteRoom, getRoomEquipment, addEquipmentToRoom, getRoomDetails, updateRoom, removeEquipmentFromRoom, checkRoomAvailability } from '../controllers/roomController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
 router.get('/', getRooms);
 
-router.post('/add', addRoom);
+router.post('/add',authenticateToken, addRoom);
 
 router.put('/:id', updateRoom);
 

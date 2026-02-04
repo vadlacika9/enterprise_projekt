@@ -1,6 +1,8 @@
 import { RoomRepository } from "../repositories/roomRepository.js";
 import { EquipmentRepository } from "../repositories/equipmentRepository.js";
 import type { RoomData, RoomEquipmentData } from "../types/room.ts";
+import { ImageService } from "./imageService.js";
+import { type CreateImageData } from '../types/image.js'
 
 const roomRepo = new RoomRepository();
 const equipmentRepo = new EquipmentRepository();
@@ -8,7 +10,7 @@ const equipmentRepo = new EquipmentRepository();
 export class RoomService {
 
     async getAllRooms() {
-        return await roomRepo.findAll();
+        return (await roomRepo.findAll());
     }
 
     async getRoomById(id: number) {
@@ -27,8 +29,16 @@ export class RoomService {
         return await roomRepo.allAvailable();
     }
 
-    async createRoom(roomData: RoomData) {
-        return await roomRepo.create(roomData);
+    async createRoom(roomData: RoomData, selectedEquipments: []) {
+
+        const newRoom = await roomRepo.create(roomData);
+        console.log("selected:" + selectedEquipments)
+        if (selectedEquipments && selectedEquipments.length > 0) {
+        await roomRepo.addMultipleEquipments(newRoom.room_id,selectedEquipments);
+    }
+
+    // 3. Visszaadjuk a teljes szoba objektumot (opcionálisan a felszerelésekkel együtt)
+    return newRoom;
     }
 
     async deleteRoom(id: number) {

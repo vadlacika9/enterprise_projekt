@@ -12,27 +12,37 @@ function requireBlobToken() {
 }
 
 export class ImageService {
-  async uploadRoomImage(roomId: number, file: Express.Multer.File) {
+  async uploadRoomImages(roomId: number, files: Express.Multer.File[]) {
+    // 1. Szoba ellenőrzése
     const room = await roomRepo.findById(roomId);
     if (!room) throw new Error('Room not found');
 
     const token = requireBlobToken();
-    const safeName = file.originalname?.replace(/[^\w.\-]+/g, '_') || 'upload';
-    const blobPath = `rooms/${roomId}/${Date.now()}-${safeName}`;
 
-    const blob = await put(blobPath, file.buffer, {
-      access: 'public',
-      contentType: file.mimetype,
-      token
+    // 2. Minden fájlra lefuttatjuk a feltöltést párhuzamosan
+    const uploadPromises = files.map(async (file) => {
+      const safeName = file.originalname?.replace(/[^\w.\-]+/g, '_') || 'upload';
+      const blobPath = `rooms/${roomId}/${Date.now()}-${safeName}`;
+
+      // Feltöltés a Vercel Blob-ba
+      const blob = await put(blobPath, file.buffer, {
+        access: 'public',
+        contentType: file.mimetype,
+        token
+      });
+
+      // Adatbázis mentés az imageRepository-val
+      return await imageRepo.create({
+        room_id: roomId,
+        url: blob.url,
+        pathname: blob.pathname,
+        contentType: file.mimetype,
+        size: file.size
+      });
     });
 
-    return await imageRepo.create({
-      room_id: roomId,
-      url: blob.url,
-      pathname: blob.pathname,
-      contentType: file.mimetype,
-      size: file.size
-    });
+    // Megvárjuk, amíg az összes feltöltés és mentés befejeződik
+    return await Promise.all(uploadPromises);
   }
 
   async listRoomImages(roomId: number) {

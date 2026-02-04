@@ -1,5 +1,6 @@
 import { RoomService } from "../services/roomService.js";
-import { type Request, type Response } from "express";
+import { type Request ,type Response } from "express";
+import { type AuthRequest } from '../middlewares/authMiddleware.js';
 const roomService = new RoomService();
 
 export const getRooms = async (req: Request, res: Response) => {
@@ -10,6 +11,32 @@ export const getRooms = async (req: Request, res: Response) => {
     catch (error: any) {
         res.status(500).json({ error: error.message });
 
+    }
+}
+
+export const addRoom = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user.id;
+        const roomData = req.body;
+        const { selectedEquipments, ...restRoomData } = roomData;
+
+        const finalRoomData = {
+            ...restRoomData,
+            user_id: userId,
+            is_available: 0,
+            capacity: Number(restRoomData.capacity),
+            hourly_price: Number(restRoomData.hourly_price),
+
+        };
+
+
+        console.log("user:", userId)
+        console.log("final:", finalRoomData);
+        const newRoom = await roomService.createRoom(finalRoomData, selectedEquipments);
+        res.status(201).json(newRoom);
+    }
+    catch (error: any) {
+        res.status(500).json({ error: error.message });
     }
 }
 
@@ -45,16 +72,7 @@ export const getAvailableRooms = async (req: Request, res: Response) => {
     }
 }
 
-export const addRoom = async (req: Request, res: Response) => {
-    try {
-        const roomData = req.body;
-        const newRoom = await roomService.createRoom(roomData);
-        res.status(201).json(newRoom);
-    }
-    catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
-}
+
 
 
 export const updateRoom = async (req: Request, res: Response) => {

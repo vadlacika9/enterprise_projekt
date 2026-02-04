@@ -10,7 +10,7 @@ const upload = multer({
 });
 
 router.get('/:id/images', listRoomImages);
-router.post('/:id/images', upload.single('file'), uploadRoomImage);
+router.post('/:id/images', upload.array('images', 10), uploadRoomImage);
 router.delete('/:roomId/images/:imageId', deleteRoomImage);
 
 export default router;

@@ -10,6 +10,13 @@ export type RoomData = {
   title: string,
   description: string,
   user_id: number,
+  selectedEquipments?: number[],
+  image?: {
+    url: string;
+    pathname: string;
+    contentType?: string;
+    size?: number;
+  }[];
 };
 
 export type RoomEquipmentData = {

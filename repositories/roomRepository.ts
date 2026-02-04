@@ -4,7 +4,11 @@ import type { RoomData } from '../types/room.ts';
 export class RoomRepository {
 
     async findAll() {
-        return await prisma.room.findMany();
+        return await prisma.room.findMany({
+            include:{
+                images: true
+            }
+        });
     }
 
     async findById(id: number) {
@@ -40,10 +44,27 @@ export class RoomRepository {
     }
 
     async create(roomData: RoomData) {
+        console.log("roomdata:" + roomData)
         return await prisma.room.create({
             data: roomData
         });
     }
+
+    async addMultipleEquipments(roomId: number, equipmentIds: number[]) {
+        console.log("ids:"+equipmentIds)
+    // A Prisma 'createMany' segítségével egyszerre szúrjuk be az összes sort
+    return await prisma.room_equipment.createMany({
+        data: equipmentIds.map((id) => ({
+            room_id: roomId,
+            equipment_id: id,
+            value: 1, // Itt megadhatod az alapértelmezett értéket
+        })),
+        // Opcionális: Ha véletlenül kétszer küldenék el ugyanazt, ne szálljon el a kód
+        skipDuplicates: true, 
+    });
+}
+
+    
 
     async delete(id: number) {
         return await prisma.room.delete({

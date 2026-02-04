@@ -4,7 +4,7 @@ import type { CreateImageData } from '../types/image.ts';
 
 export class ImageRepository {
   async create(data: CreateImageData) {
-    return await prisma.image.create({ data });
+    return await prisma.image.createMany({ data });
   }
 
   async findByRoomId(roomId: number) {

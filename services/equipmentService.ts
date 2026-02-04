@@ -23,5 +23,11 @@ export class EquipmentService {
     return await equipmentRepo.delete(id);
   }
 
+  async getRoomEquipments(roomId: number){
+    const equipment = await equipmentRepo.findByRoomId(roomId);
+    if (!equipment) throw new Error('Equipment not found');
+    return equipment;
+  }
+
 
 }

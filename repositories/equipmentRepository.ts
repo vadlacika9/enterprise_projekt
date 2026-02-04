@@ -26,12 +26,13 @@ export class EquipmentRepository {
     }
 
     async findByRoomId(roomId: number) {
-        return await prisma.room_equipment.findMany({
+        const equipments =  await prisma.room_equipment.findMany({
             where: { room_id: roomId },
             include: {
                 equipment: true
             }
         });
+        return equipments;
     }
 
 }

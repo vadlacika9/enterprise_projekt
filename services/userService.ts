@@ -57,6 +57,8 @@ export class UserService {
       throw new Error('Email already registered!');
     }
 
+    console.log(userData);
+    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 
