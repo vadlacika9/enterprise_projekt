@@ -45,7 +45,6 @@ export class UserService {
         text: `Kedves ${name}!\n\nKöszönjük, hogy regisztráltál a rendszerünkbe.\n\nÜdvözlettel:\nA Csapat`
       });
 
-      // console.log(`[EMAIL SENT]: Sending email here: ${email} | Subject: Succesfull registration | Message: Hello ${name}!`);
     } catch (error) {
       console.error('[EMAIL ERROR]: Could not send email.', error)
     }
@@ -57,8 +56,6 @@ export class UserService {
       throw new Error('Email already registered!');
     }
 
-    // console.log(userData);
-    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 

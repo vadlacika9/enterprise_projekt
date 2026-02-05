@@ -14,7 +14,7 @@ export class PaymentService {
               name: roomTitle,
               description: `Booking for Room ID: ${roomId}`,
             },
-            unit_amount: price * 100, // A Stripe fillérben (vagy fillér megfelelőjében) számol! (4500 HUF = 450000)
+            unit_amount: price * 100,
           },
           quantity: 1,
         },
