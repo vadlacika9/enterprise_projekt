@@ -13,13 +13,13 @@ router.get('/', getRooms);
 
 router.post('/add', authenticateToken, requireRole('OWNER'), upload.array('images', 10), addRoom);
 
-router.put('/:id', updateRoom);
+router.put('/:id', authenticateToken, requireRole('OWNER'), updateRoom);
 
 router.get('/:id/availability', checkRoomAvailability);
 
 router.get('/available', getAvailableRooms);
 
-router.delete('/delete/:id', deleteRoom);
+router.delete('/delete/:id', authenticateToken, requireRole('OWNER'), deleteRoom);
 
 router.get('/:id/details', getRoomDetails);
 
@@ -27,8 +27,8 @@ router.get('/:id', getRoomById);
 
 router.get('/:id/equipment', getRoomEquipment);
 
-router.post('/:roomId/:equipmentId', addEquipmentToRoom);
+router.post('/:roomId/:equipmentId', authenticateToken, requireRole('OWNER'), addEquipmentToRoom);
 
-router.delete('/:roomId/equipment/:equipmentId', removeEquipmentFromRoom);
+router.delete('/:roomId/equipment/:equipmentId', authenticateToken, requireRole('OWNER'), removeEquipmentFromRoom);
 
 export default router;

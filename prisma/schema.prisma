@@ -50,12 +50,12 @@ model room {
   hourly_price   Float            @db.Float
   room_number    String           @db.VarChar(10)
   user_id        Int
-  title          String           @db.VarChar(100)
   description    String?          @db.VarChar(255)
+  title          String           @db.VarChar(100)
   booking        booking[]
+  images         image[]
   users          users            @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "room_ibfk_1")
   room_equipment room_equipment[]
-  images         image[]
 
   @@index([user_id], map: "user_id")
 }
@@ -68,8 +68,7 @@ model image {
   contentType String?  @db.VarChar(255)
   size        Int?
   created_at  DateTime @default(now())
-
-  room room @relation(fields: [room_id], references: [room_id], onDelete: Cascade, onUpdate: Restrict, map: "image_ibfk_1")
+  room        room     @relation(fields: [room_id], references: [room_id], onDelete: Cascade, onUpdate: Restrict, map: "image_ibfk_1")
 
   @@index([room_id], map: "room_id")
 }
@@ -84,7 +83,6 @@ model room_equipment {
 
   @@id([room_id, equipment_id])
   @@index([equipment_id], map: "equipment_id")
-  @@index([room_id], map: "room_id")
 }
 
 model users {
